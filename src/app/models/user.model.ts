@@ -8,11 +8,19 @@ const userSchema = new Schema<IUser>(
       required: true,
       trim: true,
       lowercase: true,
-      unique: true,
+      unique: [true, "Duplicate Email"],
+      validate: {
+        validator: function (v) {
+          // return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)
+          return /^[\w.-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(v);
+        },
+        message: (props) => `${props.value} is not valid email.`,
+      },
     },
     firstName: {
       type: String,
-      required: true,
+      // required: true,
+      required: [true, "First Name Required"],
       trim: true,
       minlength: 5,
       maxlength: 10,
@@ -31,7 +39,14 @@ const userSchema = new Schema<IUser>(
       max: 60,
     },
     password: { type: String, required: true },
-    role: { type: String, enum: ["user", "admin"], default: "user" },
+    role: {
+      type: String,
+      enum: {
+        values: ["user", "admin"],
+        message: "Role is not valid, got {VALUE}",
+      },
+      default: "user",
+    },
   },
   {
     versionKey: false,
