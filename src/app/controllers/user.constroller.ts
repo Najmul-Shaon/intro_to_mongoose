@@ -25,16 +25,16 @@ userRouters.post("/create", async (req: Request, res: Response) => {
 });
 userRouters.post("/create-user-zod", async (req: Request, res: Response) => {
   try {
-    // const body = req.body;
-    const body = await CreateUserZodSchema.parseAsync(req.body);
+    const body = req.body;
+    // const body = await CreateUserZodSchema.parseAsync(req.body);
     console.log(body);
 
-    // const user = await User.create(body);
+    const user = await User.create(body);
 
     res.status(201).json({
       success: true,
       message: "User created successfully",
-      user: {},
+      user,
     });
   } catch (error) {
     console.log(error);
@@ -77,7 +77,7 @@ userRouters.patch("/update/:userId", async (req: Request, res: Response) => {
 });
 userRouters.delete("/delete/:userId", async (req: Request, res: Response) => {
   const userId = req.params.userId;
-  const user = await User.findByIdAndDelete(userId);
+  const user = await User.findOneAndDelete({ _id: userId });
 
   res.status(201).json({
     success: true,

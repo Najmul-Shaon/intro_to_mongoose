@@ -1,5 +1,6 @@
 import { model, Schema } from "mongoose";
 import { IUser } from "../interfaces/user.interface";
+import { Note } from "./notes.model";
 
 const userSchema = new Schema<IUser>(
   {
@@ -47,11 +48,30 @@ const userSchema = new Schema<IUser>(
       },
       default: "user",
     },
+    address: {
+      city: { type: String },
+      street: { type: String },
+      zip: { type: Number },
+    },
   },
+
   {
     versionKey: false,
     timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   }
 );
+
+userSchema.post("findOneAndDelete", async function (doc) {
+  if (doc) {
+    console.log(doc);
+    await Note.deleteMany({ user: doc._id });
+  }
+});
+
+userSchema.virtual("fullName").get(function () {
+  return `${this.firstName} ${this.lastName}`;
+});
 
 export const User = model("User", userSchema);
